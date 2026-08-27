@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Lore vs Stijn</title>
+<title>Waggy Games</title>
 <meta name="theme-color" content="#1C1240">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -274,6 +274,45 @@
   .result-msg{text-align:center;font-size:16px;font-weight:800;margin:14px 0 0;line-height:1.5;}
   .result-btns{display:flex;flex-direction:column;gap:10px;margin-top:18px;}
 
+  /* ---------- gele waggy ---------- */
+  .waggy-count{
+    font-size:72px;font-weight:900;color:var(--gold);text-align:center;
+    margin:2px 0 0;line-height:1;font-variant-numeric:tabular-nums;
+    text-shadow:0 4px 0 rgba(0,0,0,.25);
+  }
+  .waggy-count-sub{
+    text-align:center;font-size:12px;font-weight:800;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--muted);margin:6px 0 16px;
+  }
+  .waggy-btns{display:flex;gap:10px;}
+  .waggy-btn{
+    flex:1;border:none;border-radius:20px;padding:16px 8px 12px;
+    font-family:inherit;font-size:34px;font-weight:900;color:var(--ink);
+    cursor:pointer;line-height:1;
+    box-shadow:0 5px 0 rgba(0,0,0,.3);
+    transition:transform .1s ease, box-shadow .1s ease;
+  }
+  .waggy-btn:active{transform:translateY(3px) scale(.97);box-shadow:0 2px 0 rgba(0,0,0,.3);}
+  .waggy-btn.lore{background:var(--lore);}
+  .waggy-btn.stijn{background:var(--stijn);}
+  .waggy-btn .wb-sub{display:block;font-size:13px;font-weight:900;margin-top:6px;letter-spacing:.04em;}
+  .waggy-undo-row{display:flex;gap:10px;margin-top:10px;}
+  .waggy-undo{
+    flex:1;height:38px;border-radius:12px;border:1px solid var(--line);
+    background:var(--card-2);color:var(--muted);font-family:inherit;
+    font-size:12px;font-weight:800;cursor:pointer;
+  }
+  .w-rec{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:10px 4px;border-bottom:1px dashed var(--line);
+    font-weight:800;font-size:15px;
+  }
+  .w-rec:last-child{border-bottom:none;}
+  .w-rec .medal{width:30px;font-size:18px;flex:none;}
+  .w-rec .w-date{flex:1;color:var(--cream);}
+  .w-rec .w-n{color:var(--gold);font-weight:900;font-size:18px;}
+  .drive-car{position:fixed;font-size:34px;left:-60px;pointer-events:none;z-index:99;}
+
   /* ---------- confetti ---------- */
   .confetti{
     position:fixed;top:-14px;border-radius:3px;pointer-events:none;z-index:99;
@@ -289,7 +328,7 @@
   <!-- ============ HOME / GAME MENU ============ -->
   <div class="view active" id="view-home">
     <header>
-      <h1 class="logo">🎮 GAME NIGHT</h1>
+      <h1 class="logo">🎮 WAGGY GAMES</h1>
       <p class="tagline"><span class="l">Lore</span> vs <span class="s">Stijn</span> · pick a game</p>
     </header>
 
@@ -298,6 +337,15 @@
       <span class="game-info">
         <span class="game-title">Cliché Clash</span>
         <span class="game-sub" style="display:block" id="clashPreview">Daily radio duel</span>
+      </span>
+      <span class="game-go">›</span>
+    </button>
+
+    <button class="game-card" id="openWaggy">
+      <span class="game-emoji">🚕</span>
+      <span class="game-info">
+        <span class="game-title">Gele Waggy!</span>
+        <span class="game-sub" style="display:block" id="waggyPreview">Spot the yellow cars</span>
       </span>
       <span class="game-go">›</span>
     </button>
@@ -377,7 +425,7 @@
         <button class="backup-btn" id="importBtn">⬆️ Restore backup</button>
       </div>
       <input type="file" id="importFile" accept=".json,application/json" hidden>
-      <p class="backup-note">Export saves all scores to a file. Keep it somewhere safe — you can restore it any time.</p>
+      <p class="backup-note">Export saves the scores of Cliché Clash AND Gele Waggy to one file. Keep it somewhere safe — you can restore it any time.</p>
     </section>
   </div>
 
@@ -385,7 +433,7 @@
   <div class="view" id="view-quiz">
     <header>
       <h1 class="logo">🎤 EUROSONG<br>FOR KIDS</h1>
-      <p class="tagline">The big music quiz</p>
+      <p class="tagline">De grote muziekquiz</p>
     </header>
 
     <!-- playing -->
@@ -398,20 +446,49 @@
       <p class="quiz-q" id="quizQ"></p>
       <div class="answers" id="quizAnswers"></div>
       <p class="quiz-feedback" id="quizFeedback"></p>
-      <button class="next-btn" id="quizNextBtn" hidden>NEXT QUESTION ›</button>
+      <button class="next-btn" id="quizNextBtn" hidden>VOLGENDE VRAAG ›</button>
     </section>
 
     <!-- result -->
     <section class="card" id="quizResult" style="display:none">
-      <p class="eyebrow">Your score</p>
+      <p class="eyebrow">Jouw score</p>
       <p class="result-emoji" id="resultEmoji">🏆</p>
       <p class="result-score" id="resultScore">0 / 0</p>
       <p class="result-sub" id="resultPct"></p>
       <p class="result-msg" id="resultMsg"></p>
       <div class="result-btns">
-        <button class="save-btn" id="quizAgainBtn" style="margin:0;">PLAY AGAIN</button>
-        <button class="backup-btn" data-back style="height:56px;">‹ Back to games</button>
+        <button class="save-btn" id="quizAgainBtn" style="margin:0;">SPEEL OPNIEUW</button>
+        <button class="backup-btn" data-back style="height:56px;">‹ Terug naar games</button>
       </div>
+    </section>
+  </div>
+
+  <!-- ============ GELE WAGGY ============ -->
+  <div class="view" id="view-waggy">
+    <button class="back-btn" data-back>‹ Games</button>
+    <header>
+      <h1 class="logo">🚕 GELE WAGGY!</h1>
+      <p class="tagline">Spot the yellow cars</p>
+    </header>
+
+    <section class="card">
+      <p class="today-date"><span class="dot">●</span> Today · <span id="waggyTodayLabel"></span></p>
+      <p class="waggy-count" id="waggyTodayTotal">0</p>
+      <p class="waggy-count-sub">yellow waggies today</p>
+      <div class="waggy-btns">
+        <button class="waggy-btn lore" id="waggyPlusLore">🚕<span class="wb-sub">Lore · <span id="waggyLoreCount">0</span></span></button>
+        <button class="waggy-btn stijn" id="waggyPlusStijn">🚕<span class="wb-sub">Stijn · <span id="waggyStijnCount">0</span></span></button>
+      </div>
+      <div class="waggy-undo-row">
+        <button class="waggy-undo" id="waggyMinLore">− undo Lore</button>
+        <button class="waggy-undo" id="waggyMinStijn">− undo Stijn</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow">Record days 🏆</p>
+      <div id="waggyRecords"></div>
+      <p class="leader-line" id="waggyAllTime"></p>
     </section>
   </div>
 
@@ -432,6 +509,7 @@
   });
   document.getElementById("openClash").addEventListener("click", function(){ show("view-clash"); });
   document.getElementById("openQuiz").addEventListener("click", function(){ startQuiz(); show("view-quiz"); });
+  document.getElementById("openWaggy").addEventListener("click", function(){ renderWaggy(); show("view-waggy"); });
 
   // ================= CLICHÉ CLASH =================
   var KEY = "cliche-clash-v1";
@@ -479,9 +557,21 @@
     var L=0,S=0;
     entries.forEach(function(e){ L+=e.lore; S+=e.stijn; });
     var el = document.getElementById("clashPreview");
-    if(entries.length === 0){ el.textContent = "Daily radio duel"; return; }
-    var crown = L>S ? " 👑" : "", crown2 = S>L ? " 👑" : "";
-    el.innerHTML = "<span class='l'>Lore " + L + crown + "</span> — <span class='s'>" + S + crown2 + " Stijn</span>";
+    if(entries.length === 0){ el.textContent = "Daily radio duel"; }
+    else{
+      var crown = L>S ? " 👑" : "", crown2 = S>L ? " 👑" : "";
+      el.innerHTML = "<span class='l'>Lore " + L + crown + "</span> — <span class='s'>" + S + crown2 + " Stijn</span>";
+    }
+
+    var wp = document.getElementById("waggyPreview");
+    var wToday = 0, wBest = 0;
+    wEntries.forEach(function(e){
+      var n = e.lore + e.stijn;
+      if(e.date === todayStr()) wToday = n;
+      if(n > wBest) wBest = n;
+    });
+    if(wBest === 0){ wp.textContent = "Spot the yellow cars"; }
+    else{ wp.innerHTML = "Today: " + wToday + " 🚕 · Record: <span style='color:var(--gold);font-weight:900'>" + wBest + "</span>"; }
   }
 
   var sel = {lore:null, stijn:null};
@@ -663,10 +753,10 @@
   }
 
   document.getElementById("exportBtn").addEventListener("click", function(){
-    var blob = new Blob([JSON.stringify({app:"cliche-clash", version:1, entries:entries}, null, 2)], {type:"application/json"});
+    var blob = new Blob([JSON.stringify({app:"cliche-clash", version:2, entries:entries, waggy:wEntries}, null, 2)], {type:"application/json"});
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "cliche-clash-backup-" + todayStr() + ".json";
+    a.download = "waggy-games-backup-" + todayStr() + ".json";
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -690,9 +780,22 @@
             count++;
           }
         });
+        var wCount = 0;
+        if(Array.isArray(data.waggy)){
+          data.waggy.forEach(function(e){
+            if(e && typeof e.date === "string" && typeof e.lore === "number" && typeof e.stijn === "number"){
+              var ex = wFind(e.date);
+              if(ex){ ex.lore = e.lore; ex.stijn = e.stijn; }
+              else wEntries.push({date:e.date, lore:e.lore, stijn:e.stijn});
+              wCount++;
+            }
+          });
+          persistW();
+          renderWaggy();
+        }
         prefillToday();
         renderAll();
-        alert("Backup restored — " + count + " day(s) loaded. 🎉");
+        alert("Backup restored — " + count + " Cliché Clash day(s)" + (wCount ? " and " + wCount + " Gele Waggy day(s)" : "") + " loaded. 🎉");
       }catch(err){
         alert("That file doesn’t look like a Cliché Clash backup.");
       }
@@ -703,30 +806,30 @@
 
   // ================= EUROSONG FOR KIDS QUIZ =================
   var QUESTIONS = [
-    {q:"Ralf Mackenbach won Junior Eurovision 2009 for the Netherlands. With which song?", a:"Click Clack", w:["Best Friends","Abracadabra","La festa"]},
-    {q:"Which country is the ONLY one that has joined every Junior Eurovision since 2003?", a:"The Netherlands", w:["Belgium","France","Germany"]},
-    {q:"Laura’s Belgian hit “Zo verliefd (Yodelo)” is famous for what special singing style?", a:"Yodeling", w:["Rapping","Beatboxing","Opera"]},
-    {q:"Which Belgian city hosted Junior Eurovision in 2005?", a:"Hasselt", w:["Antwerp","Ghent","Brussels"]},
-    {q:"Which group sang “De vriendschapsband”, Belgium’s very first entry in 2003?", a:"X!NK", w:["Trust","Free Spirits","Unity"]},
-    {q:"In which year did Belgium take part in Junior Eurovision for the last time?", a:"2012", w:["2009","2015","2019"]},
-    {q:"Who sang Belgium’s last entry, “Abracadabra”, in 2012?", a:"Fabian", w:["Oliver","Thor!","Ralf"]},
-    {q:"“Get Up!” (Belgium 2010) was sung by which duo?", a:"Jill & Lauren", w:["Sep & Jasmijn","Lisa, Amy & Shelley","Free Spirits"]},
-    {q:"Which girl group sang “Best Friends” for the Netherlands in 2020?", a:"Unity", w:["Stay Tuned","Trust","X!NK"]},
-    {q:"Ayana’s Dutch entry in 2021 mixed Dutch, English and which surprising language?", a:"Japanese", w:["French","Spanish","Italian"]},
-    {q:"What was special about Unity’s performance in 2020?", a:"It was recorded in a Dutch studio because of corona", w:["They sang without music","They performed twice","They sang blindfolded"]},
-    {q:"Who sang “La festa” for the Netherlands in 2022?", a:"Luna", w:["Meadow","Ayana","Femke"]},
-    {q:"“Holding On to You” (Netherlands 2023) was performed by…?", a:"Sep & Jasmijn", w:["Jill & Lauren","Stay Tuned","Unity"]},
-    {q:"Which group represented the Netherlands in 2024 with the song “Music”?", a:"Stay Tuned", w:["Unity","X!NK","Free Spirits"]},
-    {q:"Meadow sang for the Netherlands in 2025. What was her song called?", a:"Freeze", w:["Music","Click Clack","Stupid"]},
-    {q:"Belgium’s best result ever was 4th place in 2009 — with which song?", a:"Zo verliefd (Yodelo)", w:["Abracadabra","Get Up!","Anders"]},
-    {q:"“Een kusje meer” (Belgium 2011) was sung by…?", a:"Femke", w:["Lindsay","Laura","Luna"]},
-    {q:"Thor! sang which Belgian entry in 2006?", a:"Een tocht door het donker", w:["Shut Up","Anders","Mes rêves"]},
-    {q:"2009 was a golden year: Laura came 4th for Belgium, and Ralf from the Netherlands…?", a:"Won the whole contest!", w:["Came second","Came last","Forgot his lyrics"]},
-    {q:"How many times has the Netherlands hosted Junior Eurovision (2007 and 2012)?", a:"Twice", w:["Never","Once","Five times"]},
-    {q:"“Shut Up” (Belgium 2008) — a bold title! Who sang it?", a:"Oliver", w:["Fabian","Thor!","Trust"]},
-    {q:"Which trio sang for the Netherlands in 2007 and later returned to grown-up Eurovision as O’G3NE?", a:"Lisa, Amy & Shelley", w:["Unity","Stay Tuned","Jill & Lauren"]},
-    {q:"Belgium’s 2004 entry “Accroche-toi” by Free Spirits was sung in which language?", a:"French", w:["Dutch","English","German"]},
-    {q:"Trust’s “Anders” (2007) got Belgium’s worst result ever. Which place?", a:"15th", w:["1st","5th","8th"]}
+    {q:"Ralf Mackenbach won het Junior Eurovisiesongfestival 2009 voor Nederland. Met welk liedje?", a:"Click Clack", w:["Best Friends","Abracadabra","La festa"]},
+    {q:"Welk land is het ENIGE dat aan elke editie sinds 2003 heeft meegedaan?", a:"Nederland", w:["België","Frankrijk","Duitsland"]},
+    {q:"Laura’s Belgische hit “Zo verliefd (Yodelo)” is beroemd om welke speciale zangstijl?", a:"Jodelen", w:["Rappen","Beatboxen","Opera"]},
+    {q:"Welke Belgische stad was gaststad van het Junior Eurovisiesongfestival in 2005?", a:"Hasselt", w:["Antwerpen","Gent","Brussel"]},
+    {q:"Welke groep zong “De vriendschapsband”, de allereerste Belgische inzending in 2003?", a:"X!NK", w:["Trust","Free Spirits","Unity"]},
+    {q:"In welk jaar deed België voor het laatst mee aan het Junior Eurovisiesongfestival?", a:"2012", w:["2009","2015","2019"]},
+    {q:"Wie zong de laatste Belgische inzending, “Abracadabra”, in 2012?", a:"Fabian", w:["Oliver","Thor!","Ralf"]},
+    {q:"“Get Up!” (België 2010) werd gezongen door welk duo?", a:"Jill & Lauren", w:["Sep & Jasmijn","Lisa, Amy & Shelley","Free Spirits"]},
+    {q:"Welke meidengroep zong “Best Friends” voor Nederland in 2020?", a:"Unity", w:["Stay Tuned","Trust","X!NK"]},
+    {q:"Ayana’s Nederlandse inzending in 2021 mengde Nederlands, Engels en welke verrassende taal?", a:"Japans", w:["Frans","Spaans","Italiaans"]},
+    {q:"Wat was er bijzonder aan het optreden van Unity in 2020?", a:"Het werd opgenomen in een Nederlandse studio door corona", w:["Ze zongen zonder muziek","Ze traden twee keer op","Ze zongen geblinddoekt"]},
+    {q:"Wie zong “La festa” voor Nederland in 2022?", a:"Luna", w:["Meadow","Ayana","Femke"]},
+    {q:"“Holding On to You” (Nederland 2023) werd gezongen door…?", a:"Sep & Jasmijn", w:["Jill & Lauren","Stay Tuned","Unity"]},
+    {q:"Welke groep vertegenwoordigde Nederland in 2024 met het liedje “Music”?", a:"Stay Tuned", w:["Unity","X!NK","Free Spirits"]},
+    {q:"Meadow zong voor Nederland in 2025. Hoe heette haar liedje?", a:"Freeze", w:["Music","Click Clack","Stupid"]},
+    {q:"Het beste Belgische resultaat ooit was een 4e plaats in 2009 — met welk liedje?", a:"Zo verliefd (Yodelo)", w:["Abracadabra","Get Up!","Anders"]},
+    {q:"“Een kusje meer” (België 2011) werd gezongen door…?", a:"Femke", w:["Lindsay","Laura","Luna"]},
+    {q:"Thor! zong welke Belgische inzending in 2006?", a:"Een tocht door het donker", w:["Shut Up","Anders","Mes rêves"]},
+    {q:"2009 was een topjaar: Laura werd 4e voor België, en Ralf uit Nederland…?", a:"Won de hele wedstrijd!", w:["Werd tweede","Werd laatste","Vergat zijn tekst"]},
+    {q:"Hoe vaak was Nederland gastland van het Junior Eurovisiesongfestival (2007 en 2012)?", a:"Twee keer", w:["Nooit","Eén keer","Vijf keer"]},
+    {q:"“Shut Up” (België 2008) — een gedurfde titel! Wie zong het?", a:"Oliver", w:["Fabian","Thor!","Trust"]},
+    {q:"Welk trio zong voor Nederland in 2007 en stond later als O’G3NE op het grote Songfestival?", a:"Lisa, Amy & Shelley", w:["Unity","Stay Tuned","Jill & Lauren"]},
+    {q:"De Belgische inzending “Accroche-toi” van Free Spirits (2004) was in welke taal?", a:"Frans", w:["Nederlands","Engels","Duits"]},
+    {q:"Trusts “Anders” (2007) behaalde het slechtste Belgische resultaat ooit. Welke plaats?", a:"15e", w:["1e","5e","8e"]}
   ];
 
   var quiz = {order:[], idx:0, score:0, answered:0, locked:false};
@@ -783,17 +886,17 @@
     });
     if(good){
       quiz.score++;
-      fb.textContent = "Correct! 🎉";
+      fb.textContent = "Juist! 🎉";
       fb.classList.add("good");
       if(navigator.vibrate) navigator.vibrate([12,40,12]);
     }else{
-      fb.textContent = "Oops! The answer was: " + correct;
+      fb.textContent = "Oeps! Het antwoord was: " + correct;
       fb.classList.add("bad");
       if(navigator.vibrate) navigator.vibrate(60);
     }
     document.getElementById("quizScorePill").textContent = "⭐ " + quiz.score;
     var nb = document.getElementById("quizNextBtn");
-    nb.textContent = (quiz.idx + 1 < quiz.order.length) ? "NEXT QUESTION ›" : "SEE MY SCORE 🏆";
+    nb.textContent = (quiz.idx + 1 < quiz.order.length) ? "VOLGENDE VRAAG ›" : "BEKIJK MIJN SCORE 🏆";
     nb.hidden = false;
   }
 
@@ -817,14 +920,14 @@
     document.getElementById("quizResult").style.display = "";
     document.getElementById("resultScore").textContent = s + " / " + n;
     var pct = n === 0 ? 0 : Math.round((s/n)*100);
-    document.getElementById("resultPct").textContent = n === 0 ? "No questions answered" : pct + "% correct · " + n + " question" + (n===1?"":"s") + " played";
+    document.getElementById("resultPct").textContent = n === 0 ? "Geen vragen beantwoord" : pct + "% juist · " + n + (n===1 ? " vraag" : " vragen") + " gespeeld";
     var emoji, msg;
-    if(n === 0){ emoji = "🎤"; msg = "You stopped before the first question — the stage is still waiting for you!"; }
-    else if(pct === 100){ emoji = "👑"; msg = "PERFECT! Twelve points! You’re a true Junior Eurosong superfan!"; confetti(); }
-    else if(pct >= 75){ emoji = "🏆"; msg = "Amazing! You clearly know your Junior Eurosong classics!"; confetti(); }
-    else if(pct >= 50){ emoji = "🌟"; msg = "Nice! A solid spot in the top half of the scoreboard!"; }
-    else if(pct >= 25){ emoji = "🎶"; msg = "Not bad — time to rewatch some old Junior Eurosong finals!"; }
-    else { emoji = "📻"; msg = "Yodelo! Better luck next time — Laura believes in you!"; }
+    if(n === 0){ emoji = "🎤"; msg = "Je stopte vóór de eerste vraag — het podium wacht nog op je!"; }
+    else if(pct === 100){ emoji = "👑"; msg = "PERFECT! Twaalf punten! Jij bent een echte Junior Eurosong-superfan!"; confetti(); }
+    else if(pct >= 75){ emoji = "🏆"; msg = "Geweldig! Jij kent je Junior Eurosong-klassiekers!"; confetti(); }
+    else if(pct >= 50){ emoji = "🌟"; msg = "Mooi! Een stevige plek in de bovenste helft van het scorebord!"; }
+    else if(pct >= 25){ emoji = "🎶"; msg = "Niet slecht — tijd om wat oude Junior Eurosong-finales te herbekijken!"; }
+    else { emoji = "📻"; msg = "Jodelo! Volgende keer beter — Laura gelooft in jou!"; }
     document.getElementById("resultEmoji").textContent = emoji;
     document.getElementById("resultMsg").textContent = msg;
     window.scrollTo(0,0);
@@ -833,6 +936,125 @@
   document.getElementById("quizAgainBtn").addEventListener("click", function(){
     startQuiz();
   });
+
+  // ================= GELE WAGGY =================
+  var WKEY = "gele-waggy-v1";
+  function loadW(){
+    try{
+      var raw = localStorage.getItem(WKEY);
+      if(!raw) return [];
+      var d = JSON.parse(raw);
+      return Array.isArray(d.entries) ? d.entries : [];
+    }catch(e){ return []; }
+  }
+  function persistW(){
+    try{
+      localStorage.setItem(WKEY, JSON.stringify({app:"gele-waggy", version:1, entries:wEntries}));
+    }catch(e){
+      alert("Could not save. Your phone may be blocking storage (private browsing?).");
+    }
+  }
+  var wEntries = loadW();
+
+  function wFind(date){
+    for(var i=0;i<wEntries.length;i++) if(wEntries[i].date===date) return wEntries[i];
+    return null;
+  }
+  function wSpot(player, delta){
+    var e = wFind(todayStr());
+    if(!e){
+      if(delta < 0) return;
+      e = {date:todayStr(), lore:0, stijn:0};
+      wEntries.push(e);
+    }
+    var next = Math.max(0, e[player] + delta);
+    if(next === e[player]) return;
+    e[player] = next;
+    persistW();
+    renderWaggy();
+    renderHome();
+    if(navigator.vibrate) navigator.vibrate(delta > 0 ? [10,30,10] : 20);
+    if(delta > 0) driveCar();
+  }
+  document.getElementById("waggyPlusLore").addEventListener("click", function(){ wSpot("lore", 1); });
+  document.getElementById("waggyPlusStijn").addEventListener("click", function(){ wSpot("stijn", 1); });
+  document.getElementById("waggyMinLore").addEventListener("click", function(){ wSpot("lore", -1); });
+  document.getElementById("waggyMinStijn").addEventListener("click", function(){ wSpot("stijn", -1); });
+
+  function renderWaggy(){
+    document.getElementById("waggyTodayLabel").textContent = fmtDate(todayStr());
+    var t = wFind(todayStr()) || {lore:0, stijn:0};
+    document.getElementById("waggyLoreCount").textContent = t.lore;
+    document.getElementById("waggyStijnCount").textContent = t.stijn;
+    document.getElementById("waggyTodayTotal").textContent = t.lore + t.stijn;
+
+    // record days (top 3)
+    var box = document.getElementById("waggyRecords");
+    box.innerHTML = "";
+    var days = wEntries
+      .map(function(e){ return {date:e.date, n:e.lore + e.stijn}; })
+      .filter(function(d){ return d.n > 0; })
+      .sort(function(a,b){ return b.n - a.n || (a.date < b.date ? 1 : -1); })
+      .slice(0,3);
+    if(days.length === 0){
+      var em = document.createElement("div");
+      em.className = "empty";
+      em.textContent = "No yellow cars spotted yet — keep your eyes open! 👀";
+      box.appendChild(em);
+    }else{
+      var medals = ["🥇","🥈","🥉"];
+      days.forEach(function(d,i){
+        var row = document.createElement("div");
+        row.className = "w-rec";
+        var isToday = d.date === todayStr();
+        var info = document.createElement("span");
+        info.className = "w-date";
+        info.innerHTML = "<span class='medal'>" + medals[i] + "</span> " + fmtDate(d.date) + (isToday ? " <span style='color:var(--gold)'>· today!</span>" : "");
+        var n = document.createElement("span");
+        n.className = "w-n";
+        n.textContent = d.n + " 🚕";
+        var del = document.createElement("button");
+        del.className = "icon-btn";
+        del.style.width = "34px"; del.style.height = "34px"; del.style.fontSize = "14px";
+        del.textContent = "🗑️";
+        del.setAttribute("aria-label", "Delete " + fmtDate(d.date));
+        del.addEventListener("click", function(){
+          if(confirm("Remove " + fmtDate(d.date) + " (" + d.n + " waggies) from the log?")){
+            wEntries = wEntries.filter(function(x){ return x.date !== d.date; });
+            persistW();
+            renderWaggy();
+            renderHome();
+          }
+        });
+        row.appendChild(info); row.appendChild(n); row.appendChild(del);
+        box.appendChild(row);
+      });
+    }
+
+    // all-time line
+    var L=0, S=0;
+    wEntries.forEach(function(e){ L+=e.lore; S+=e.stijn; });
+    var at = document.getElementById("waggyAllTime");
+    if(L+S === 0){ at.textContent = ""; }
+    else{
+      var crownL = L>S ? " 👑" : "", crownS = S>L ? " 👑" : "";
+      at.innerHTML = "All time: " + (L+S) + " 🚕 · <span style='color:var(--lore)'>Lore " + L + crownL + "</span> — <span style='color:var(--stijn)'>" + S + crownS + " Stijn</span>";
+    }
+  }
+
+  function driveCar(){
+    if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var car = document.createElement("div");
+    car.className = "drive-car";
+    car.textContent = "🚕";
+    car.style.top = (25 + Math.random()*45) + "vh";
+    document.body.appendChild(car);
+    car.animate([
+      {transform:"translateX(0)"},
+      {transform:"translateX(120vw)"}
+    ], {duration:900, easing:"cubic-bezier(.3,.1,.4,1)"});
+    setTimeout(function(){ car.remove(); }, 1000);
+  }
 
   // ================= CONFETTI =================
   function confetti(){
@@ -872,7 +1094,7 @@
   }catch(e){}
 
   // ================= GO =================
-  function renderAll(){ renderBoard(); renderHistory(); refreshChips(); renderHome(); }
+  function renderAll(){ renderBoard(); renderHistory(); refreshChips(); renderWaggy(); renderHome(); }
   prefillToday();
   renderAll();
 })();
