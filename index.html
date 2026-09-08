@@ -313,6 +313,45 @@
   .w-rec .w-n{color:var(--gold);font-weight:900;font-size:18px;}
   .drive-car{position:fixed;font-size:34px;left:-60px;pointer-events:none;z-index:99;}
 
+  /* ---------- automated RPS ---------- */
+  .auto-head{display:flex;align-items:center;justify-content:space-between;}
+  .switch{position:relative;display:inline-block;width:54px;height:32px;flex:none;}
+  .switch input{opacity:0;width:0;height:0;}
+  .slider{
+    position:absolute;inset:0;border-radius:99px;cursor:pointer;
+    background:var(--card-2);border:1px solid var(--line);
+    transition:background .2s ease;
+  }
+  .slider:before{
+    content:"";position:absolute;height:24px;width:24px;left:3px;top:3px;
+    border-radius:50%;background:var(--muted);
+    transition:transform .2s ease, background .2s ease;
+  }
+  .switch input:checked + .slider{background:var(--gold);border-color:var(--gold);}
+  .switch input:checked + .slider:before{transform:translateX(22px);background:var(--ink);}
+  .auto-arena{
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+    margin:14px 0 2px;
+  }
+  .auto-hand{font-size:56px;text-align:center;line-height:1;}
+  .auto-hand.shaking{animation:fistShake .45s ease-in-out infinite;}
+  .auto-hand.reveal{animation:pop .3s cubic-bezier(.34,1.56,.64,1);}
+  @keyframes fistShake{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .auto-mid{
+    font-size:30px;font-weight:900;color:var(--gold);
+    min-width:56px;text-align:center;
+  }
+  .auto-names{
+    display:flex;justify-content:space-between;padding:0 10%;
+    font-size:14px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;
+    margin-top:6px;
+  }
+  .auto-result{
+    text-align:center;font-size:15px;font-weight:800;color:var(--muted);
+    margin:12px 0 0;min-height:20px;
+  }
+  .auto-result.big{color:var(--cream);animation:pop .3s ease;}
+
   /* ---------- confetti ---------- */
   .confetti{
     position:fixed;top:-14px;border-radius:3px;pointer-events:none;z-index:99;
@@ -520,6 +559,29 @@
       <div class="waggy-undo-row">
         <button class="waggy-undo" id="rpsMinLore">− undo Lore</button>
         <button class="waggy-undo" id="rpsMinStijn">− undo Stijn</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="auto-head">
+        <p class="eyebrow" style="margin:0;text-align:left;">Automated game</p>
+        <label class="switch">
+          <input type="checkbox" id="autoToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div id="autoPanel" hidden>
+        <div class="auto-arena">
+          <span class="auto-hand" id="autoHandL">✊</span>
+          <span class="auto-mid" id="autoMid">🆚</span>
+          <span class="auto-hand" id="autoHandR">✊</span>
+        </div>
+        <div class="auto-names">
+          <span style="color:var(--lore)">Lore</span>
+          <span style="color:var(--stijn)">Stijn</span>
+        </div>
+        <p class="auto-result" id="autoResult">The game picks for both — winner gets +1!</p>
+        <button class="next-btn" id="autoPlayBtn">▶ PLAY</button>
       </div>
     </section>
 
@@ -1247,6 +1309,62 @@
       list.appendChild(item);
     });
   }
+
+  // ----- automated game -----
+  var autoBusy = false;
+  document.getElementById("autoToggle").addEventListener("change", function(){
+    document.getElementById("autoPanel").hidden = !this.checked;
+  });
+
+  document.getElementById("autoPlayBtn").addEventListener("click", function(){
+    if(autoBusy) return;
+    autoBusy = true;
+    var hL = document.getElementById("autoHandL");
+    var hR = document.getElementById("autoHandR");
+    var mid = document.getElementById("autoMid");
+    var res = document.getElementById("autoResult");
+    var btn = document.getElementById("autoPlayBtn");
+    btn.disabled = true;
+    res.textContent = "";
+    res.className = "auto-result";
+    hL.textContent = "✊"; hR.textContent = "✊";
+    hL.className = "auto-hand shaking"; hR.className = "auto-hand shaking";
+
+    var steps = ["3","2","1"];
+    var i = 0;
+    mid.textContent = steps[0];
+    if(navigator.vibrate) navigator.vibrate(15);
+    var timer = setInterval(function(){
+      i++;
+      if(i < steps.length){
+        mid.textContent = steps[i];
+        if(navigator.vibrate) navigator.vibrate(15);
+        return;
+      }
+      clearInterval(timer);
+      // reveal
+      var hands = ["✊","✋","✌️"];
+      var l = hands[Math.floor(Math.random()*3)];
+      var s = hands[Math.floor(Math.random()*3)];
+      hL.className = "auto-hand reveal"; hR.className = "auto-hand reveal";
+      hL.textContent = l; hR.textContent = s;
+      mid.textContent = "🆚";
+      res.classList.add("big");
+      var beats = {"✊":"✌️","✋":"✊","✌️":"✋"}; // rock beats scissors, paper beats rock, scissors beats paper
+      if(l === s){
+        res.innerHTML = "Gelijk! " + l + " vs " + s + " — play again! 😄";
+      }else if(beats[l] === s){
+        res.innerHTML = "<span style='color:var(--lore)'>Lore wins!</span> " + l + " beats " + s;
+        rWin("lore", 1);
+      }else{
+        res.innerHTML = "<span style='color:var(--stijn)'>Stijn wins!</span> " + s + " beats " + l;
+        rWin("stijn", 1);
+      }
+      btn.textContent = "▶ PLAY AGAIN";
+      btn.disabled = false;
+      autoBusy = false;
+    }, 650);
+  });
 
   function handPop(player){
     if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
