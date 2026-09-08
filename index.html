@@ -359,6 +359,15 @@
       <span class="game-go">›</span>
     </button>
 
+    <button class="game-card" id="openRps">
+      <span class="game-emoji">✌️</span>
+      <span class="game-info">
+        <span class="game-title">Rock Paper Scissors</span>
+        <span class="game-sub" style="display:block" id="rpsPreview">Steen · papier · schaar</span>
+      </span>
+      <span class="game-go">›</span>
+    </button>
+
     <footer>Daily on the radio 📻</footer>
   </div>
 
@@ -425,7 +434,7 @@
         <button class="backup-btn" id="importBtn">⬆️ Restore backup</button>
       </div>
       <input type="file" id="importFile" accept=".json,application/json" hidden>
-      <p class="backup-note">Export saves the scores of Cliché Clash AND Gele Waggy to one file. Keep it somewhere safe — you can restore it any time.</p>
+      <p class="backup-note">Export saves the scores of ALL games (Cliché Clash, Gele Waggy and Rock Paper Scissors) to one file. Keep it somewhere safe — you can restore it any time.</p>
     </section>
   </div>
 
@@ -492,6 +501,57 @@
     </section>
   </div>
 
+  <!-- ============ ROCK PAPER SCISSORS ============ -->
+  <div class="view" id="view-rps">
+    <button class="back-btn" data-back>‹ Games</button>
+    <header>
+      <h1 class="logo">✊✋✌️</h1>
+      <p class="tagline">Rock · Paper · Scissors</p>
+    </header>
+
+    <section class="card">
+      <p class="today-date"><span class="dot">●</span> Today · <span id="rpsTodayLabel"></span></p>
+      <p class="waggy-count" id="rpsTodayScore" style="font-size:44px;">0 — 0</p>
+      <p class="waggy-count-sub">today · <span style="color:var(--lore)">Lore</span> vs <span style="color:var(--stijn)">Stijn</span></p>
+      <div class="waggy-btns">
+        <button class="waggy-btn lore" id="rpsWinLore">✊<span class="wb-sub">Lore won!</span></button>
+        <button class="waggy-btn stijn" id="rpsWinStijn">✌️<span class="wb-sub">Stijn won!</span></button>
+      </div>
+      <div class="waggy-undo-row">
+        <button class="waggy-undo" id="rpsMinLore">− undo Lore</button>
+        <button class="waggy-undo" id="rpsMinStijn">− undo Stijn</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow">All-time wins</p>
+      <div class="board">
+        <div class="side left">
+          <span class="crown" id="rpsCrownL" hidden>👑</span>
+          <div class="total" id="rpsTotalL">0</div>
+          <div class="who">Lore</div>
+        </div>
+        <div class="vs">VS</div>
+        <div class="side right">
+          <span class="crown" id="rpsCrownR" hidden>👑</span>
+          <div class="total" id="rpsTotalR">0</div>
+          <div class="who">Stijn</div>
+        </div>
+      </div>
+      <div class="tug" aria-hidden="true">
+        <div class="l" id="rpsTugL" style="width:50%"></div>
+        <div class="notch"></div>
+        <div class="s"></div>
+      </div>
+      <p class="leader-line" id="rpsLeaderLine">It’s a tie! 🤝</p>
+    </section>
+
+    <section>
+      <p class="eyebrow" style="margin-bottom:10px;">Day by day</p>
+      <div class="history" id="rpsHistory"></div>
+    </section>
+  </div>
+
 </div>
 
 <script>
@@ -510,6 +570,7 @@
   document.getElementById("openClash").addEventListener("click", function(){ show("view-clash"); });
   document.getElementById("openQuiz").addEventListener("click", function(){ startQuiz(); show("view-quiz"); });
   document.getElementById("openWaggy").addEventListener("click", function(){ renderWaggy(); show("view-waggy"); });
+  document.getElementById("openRps").addEventListener("click", function(){ renderRps(); show("view-rps"); });
 
   // ================= CLICHÉ CLASH =================
   var KEY = "cliche-clash-v1";
@@ -572,6 +633,15 @@
     });
     if(wBest === 0){ wp.textContent = "Spot the yellow cars"; }
     else{ wp.innerHTML = "Today: " + wToday + " 🚕 · Record: <span style='color:var(--gold);font-weight:900'>" + wBest + "</span>"; }
+
+    var rp = document.getElementById("rpsPreview");
+    var rL=0, rS=0;
+    rEntries.forEach(function(e){ rL+=e.lore; rS+=e.stijn; });
+    if(rL+rS === 0){ rp.textContent = "Steen · papier · schaar"; }
+    else{
+      var rc = rL>rS ? " 👑" : "", rc2 = rS>rL ? " 👑" : "";
+      rp.innerHTML = "<span class='l'>Lore " + rL + rc + "</span> — <span class='s'>" + rS + rc2 + " Stijn</span>";
+    }
   }
 
   var sel = {lore:null, stijn:null};
@@ -753,7 +823,7 @@
   }
 
   document.getElementById("exportBtn").addEventListener("click", function(){
-    var blob = new Blob([JSON.stringify({app:"cliche-clash", version:2, entries:entries, waggy:wEntries}, null, 2)], {type:"application/json"});
+    var blob = new Blob([JSON.stringify({app:"cliche-clash", version:2, entries:entries, waggy:wEntries, rps:rEntries}, null, 2)], {type:"application/json"});
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "waggy-games-backup-" + todayStr() + ".json";
@@ -793,9 +863,21 @@
           persistW();
           renderWaggy();
         }
+        var rCount = 0;
+        if(Array.isArray(data.rps)){
+          data.rps.forEach(function(e){
+            if(e && typeof e.date === "string" && typeof e.lore === "number" && typeof e.stijn === "number"){
+              var rx = rFind(e.date);
+              if(rx){ rx.lore = e.lore; rx.stijn = e.stijn; }
+              else rEntries.push({date:e.date, lore:e.lore, stijn:e.stijn});
+              rCount++;
+            }
+          });
+          persistR();
+        }
         prefillToday();
         renderAll();
-        alert("Backup restored — " + count + " Cliché Clash day(s)" + (wCount ? " and " + wCount + " Gele Waggy day(s)" : "") + " loaded. 🎉");
+        alert("Backup restored — " + count + " Cliché Clash day(s)" + (wCount ? ", " + wCount + " Gele Waggy day(s)" : "") + (rCount ? ", " + rCount + " Rock Paper Scissors day(s)" : "") + " loaded. 🎉");
       }catch(err){
         alert("That file doesn’t look like a Cliché Clash backup.");
       }
@@ -1056,6 +1138,137 @@
     setTimeout(function(){ car.remove(); }, 1000);
   }
 
+  // ================= ROCK PAPER SCISSORS =================
+  var RKEY = "rps-v1";
+  function loadR(){
+    try{
+      var raw = localStorage.getItem(RKEY);
+      if(!raw) return [];
+      var d = JSON.parse(raw);
+      return Array.isArray(d.entries) ? d.entries : [];
+    }catch(e){ return []; }
+  }
+  function persistR(){
+    try{
+      localStorage.setItem(RKEY, JSON.stringify({app:"rps", version:1, entries:rEntries}));
+    }catch(e){
+      alert("Could not save. Your phone may be blocking storage (private browsing?).");
+    }
+  }
+  var rEntries = loadR();
+
+  function rFind(date){
+    for(var i=0;i<rEntries.length;i++) if(rEntries[i].date===date) return rEntries[i];
+    return null;
+  }
+  function rWin(player, delta){
+    var e = rFind(todayStr());
+    if(!e){
+      if(delta < 0) return;
+      e = {date:todayStr(), lore:0, stijn:0};
+      rEntries.push(e);
+    }
+    var next = Math.max(0, e[player] + delta);
+    if(next === e[player]) return;
+    e[player] = next;
+    persistR();
+    renderRps();
+    renderHome();
+    if(navigator.vibrate) navigator.vibrate(delta > 0 ? [10,30,10] : 20);
+    if(delta > 0) handPop(player);
+  }
+  document.getElementById("rpsWinLore").addEventListener("click", function(){ rWin("lore", 1); });
+  document.getElementById("rpsWinStijn").addEventListener("click", function(){ rWin("stijn", 1); });
+  document.getElementById("rpsMinLore").addEventListener("click", function(){ rWin("lore", -1); });
+  document.getElementById("rpsMinStijn").addEventListener("click", function(){ rWin("stijn", -1); });
+
+  function renderRps(){
+    document.getElementById("rpsTodayLabel").textContent = fmtDate(todayStr());
+    var t = rFind(todayStr()) || {lore:0, stijn:0};
+    document.getElementById("rpsTodayScore").innerHTML =
+      "<span style='color:var(--lore)'>" + t.lore + "</span><span style='color:var(--muted)'> — </span><span style='color:var(--stijn)'>" + t.stijn + "</span>";
+
+    // all-time board
+    var L=0, S=0;
+    rEntries.forEach(function(e){ L+=e.lore; S+=e.stijn; });
+    document.getElementById("rpsTotalL").textContent = L;
+    document.getElementById("rpsTotalR").textContent = S;
+    document.getElementById("rpsCrownL").hidden = !(L>S);
+    document.getElementById("rpsCrownR").hidden = !(S>L);
+    var line = document.getElementById("rpsLeaderLine");
+    if(L>S) line.innerHTML = "<span style='color:var(--lore)'>Lore</span> leads by " + (L-S) + " 🏆";
+    else if(S>L) line.innerHTML = "<span style='color:var(--stijn)'>Stijn</span> leads by " + (S-L) + " 🏆";
+    else line.textContent = "It’s a tie! 🤝";
+    var pct = (L+S) === 0 ? 50 : (L/(L+S))*100;
+    pct = Math.max(8, Math.min(92, pct));
+    document.getElementById("rpsTugL").style.width = pct + "%";
+
+    // day-by-day log
+    var list = document.getElementById("rpsHistory");
+    list.innerHTML = "";
+    var days = rEntries.slice().sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+    if(days.length === 0){
+      var em = document.createElement("div");
+      em.className = "empty";
+      em.textContent = "No battles yet — schaar, steen, papier! ✊";
+      list.appendChild(em);
+      return;
+    }
+    days.forEach(function(e){
+      var item = document.createElement("div");
+      item.className = "h-item";
+      var top = document.createElement("div");
+      top.className = "h-top";
+      var left = document.createElement("div");
+      var d = document.createElement("div");
+      d.className = "h-date";
+      d.textContent = fmtDate(e.date);
+      var sc = document.createElement("div");
+      sc.className = "h-score";
+      var lw = e.lore > e.stijn ? " win" : "";
+      var sw = e.stijn > e.lore ? " win" : "";
+      sc.innerHTML = "<span class='ln"+lw+"'>Lore " + e.lore + "</span><span class='dash'> — </span><span class='sn"+sw+"'>" + e.stijn + " Stijn</span>";
+      left.appendChild(d); left.appendChild(sc);
+      var actions = document.createElement("div");
+      actions.className = "h-actions";
+      var db = document.createElement("button");
+      db.className = "icon-btn"; db.textContent = "🗑️"; db.setAttribute("aria-label","Delete " + fmtDate(e.date));
+      db.addEventListener("click", function(){
+        if(confirm("Delete the battles of " + fmtDate(e.date) + "?")){
+          rEntries = rEntries.filter(function(x){ return x.date !== e.date; });
+          persistR();
+          renderRps();
+          renderHome();
+        }
+      });
+      actions.appendChild(db);
+      top.appendChild(left); top.appendChild(actions);
+      item.appendChild(top);
+      list.appendChild(item);
+    });
+  }
+
+  function handPop(player){
+    if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var hands = ["✊","✋","✌️"];
+    for(var i=0;i<3;i++){
+      var h = document.createElement("div");
+      h.className = "drive-car";
+      h.textContent = hands[i];
+      h.style.left = (player === "lore" ? 15 : 60) + Math.random()*20 + "vw";
+      h.style.top = "62vh";
+      document.body.appendChild(h);
+      h.animate([
+        {transform:"translateY(0) scale(.6)", opacity:0},
+        {transform:"translateY(-14vh) scale(1.15)", opacity:1, offset:.35},
+        {transform:"translateY(-30vh) scale(1)", opacity:0}
+      ], {duration:800, delay:i*90, easing:"ease-out", fill:"forwards"});
+    }
+    setTimeout(function(){
+      document.querySelectorAll(".drive-car").forEach(function(el){ if(hands.indexOf(el.textContent) !== -1) el.remove(); });
+    }, 1300);
+  }
+
   // ================= CONFETTI =================
   function confetti(){
     if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -1094,7 +1307,7 @@
   }catch(e){}
 
   // ================= GO =================
-  function renderAll(){ renderBoard(); renderHistory(); refreshChips(); renderWaggy(); renderHome(); }
+  function renderAll(){ renderBoard(); renderHistory(); refreshChips(); renderWaggy(); renderRps(); renderHome(); }
   prefillToday();
   renderAll();
 })();
